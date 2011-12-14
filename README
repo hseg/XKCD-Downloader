@@ -1,0 +1,6 @@
+Downloads XKCD comics and saves them with their metadata.
+
+The tool downloads the JSON for the specified comic and parses it.
+It then saves the metadata in an HTML file, along with the image.
+
+Inspired by: Fanfiction Downloader - http://fanfictionloader.appspot.com/
