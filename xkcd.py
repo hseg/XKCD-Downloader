@@ -2,6 +2,10 @@
 # Downloads an XKCD comic given the comic number.
 # Filters the data and reformats it.
 
+# TODO: Generate Markdown instead of HTML, more generic
+# TODO: Refactor
+# TODO: Command line arguments
+
 XKCD_IP='72.26.203.99'
 
 from urllib.request import urlopen as uopen
