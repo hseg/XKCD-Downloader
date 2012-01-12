@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # XKCD Downloader
 # Downloads an XKCD comic given the comic number.
 # Filters the data and reformats it.
