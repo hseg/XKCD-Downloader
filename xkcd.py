@@ -26,10 +26,8 @@ TEMPLATES={}
 
 def gen_templates():
     TEMPLATES['head'] = string.Template('''
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
 <title>XKCD: ${safe_title}</title>
 </head>
@@ -40,7 +38,7 @@ def gen_templates():
        string.Template('<tr><td><b>${label}</b></td><td>${value}</td></tr>')
     TEMPLATES['tail'] = string.Template('''
 </table>
-<a href="${img}"><img src="${num}.png" title=${alt} /></a>
+<a href="${img}"><img src="${num}.png" title="${alt}" /></a>
 <p>${alt}</p>
 <br/><br/>
 <p>${transcript}
