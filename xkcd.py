@@ -93,13 +93,23 @@ def download(num):
     img = open('{0}.png'.format(num), 'bw')
     img.write(image.read())
 
+import os.path
+
 if __name__ == "__main__":
     gen_templates()
     # Get latest comic number
     num = get_json(0)['num']
 
-    os.chdir('..\XKCD')
-    for i in xrange(1, num+1):
+    path = os.path.join('..', 'xkcd')
+
+    if not os.path.exists(path) or (os.path.exists(path) and not os.path.isdir(path)):
+      try:
+        os.makedirs(path)
+      except os.error:
+        print ("The directory to save xkcd to doesn't exist and I couldn't create it, %s" % path)
+        exit()
+    os.chdir(path)
+    for i in range(1, num+1):
         if i != 404:
             print(i)
             download(i)
