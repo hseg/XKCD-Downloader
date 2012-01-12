@@ -48,7 +48,10 @@ def gen_templates():
 
 def get_url(num):
     if(num >= 1):
-        return 'http://' + XKCD_IP + '/{0}/info.0.json'.format(num)
+        try:
+            return 'http://' + XKCD_IP + '/{0}/info.0.json'.format(num)
+        except AttributeError:
+            return 'http://' + XKCD_IP + '/%d/info.0.json' % num
     else:
         return 'http://' + XKCD_IP + '/info.0.json'
 
@@ -58,7 +61,7 @@ def get_json(num):
 # Download JSON
     while True:
         try:
-            comic = uopen(url).readall().decode()
+            comic = uopen(url).read().decode()
             break
         except:
             raise
@@ -67,7 +70,12 @@ def get_json(num):
     return json.loads(comic)
 
 def update_meta(meta):
-    meta['date'] = '{0}/{1}/{2}'.format(meta['day'], meta['month'], meta['year'])
+    try:
+        meta['date'] = '{0}/{1}/{2}'.format(meta['day'],
+            meta['month'], meta['year'])
+    except AttributeError:
+        meta['date'] = '{%s}/{%s}/{%s}' % (meta['day'],
+            meta['month'], meta['year'])
     meta['url'] = url.rsplit('/', 1)[0] + '/'
 
 
@@ -75,8 +83,12 @@ def download(num):
     data = get_json(num)
 
     # Save JSON
-    json_file = open('{0}.json'.format(num), 'w', encoding='utf-8')
-    json_file.write(str(data))
+    if sys.version_info[0] >= 3:
+        json_file = open('{0}.json'.format(num), 'w', encoding='utf-8')
+        json_file.write(str(data))
+    else:
+        json_file = open('%d.json' % num, 'w')
+        json_file.write(str(data).encode('utf-8'))
 
     # Create HTML from template
     update_meta(data)
@@ -84,14 +96,26 @@ def download(num):
                 'link': 'Link:'}
 
     # Write HTML and image to file
-    file = open('{0}.html'.format(num), 'w', encoding='utf-8')
-    file.write(head.substitute(data))
-    for i in filter((lambda i: i or False), meta_labels.keys()):
-        file.write(entry.substitute({'label': meta_labels[i], 'value': data[i]}))
-    file.write(tail.substitute(data))
+    if sys.version_info[0] >= 3:
+        file = open('{0}.html'.format(num), 'w', encoding='utf-8')
+        file.write(head.substitute(data))
+        for i in filter((lambda i: i or False), meta_labels.keys()):
+            file.write(entry.substitute({'label': meta_labels[i], 'value': data[i]}))
+        file.write(tail.substitute(data))
+        file.close()
+    else:
+        file = open('%d.html' % num, 'w')
+        file.write(head.substitute(data.encode('utf-8')))
+        for i in filter((lambda i: i or False), meta_labels.keys()):
+            file.write(entry.substitute({'label': meta_labels[i], 'value': data[i]}).encode('utf-8'))
+        file.write(tail.substitute(data).encode('utf-8'))
+        file.close()
 
     image = uopen(data['img'])
-    img = open('{0}.png'.format(num), 'bw')
+    try:
+        img = open('{0}.png'.format(num), 'bw')
+    except AttributeError:
+        img = open('%d.png' % num, 'bw')
     img.write(image.read())
 
 import os.path
