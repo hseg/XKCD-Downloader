@@ -2,12 +2,21 @@
 # XKCD Downloader
 # Downloads an XKCD comic given the comic number.
 # Filters the data and reformats it.
-
-from urllib.request import urlopen as uopen
-import string
-import urllib.request
-import json
 import sys
+
+try:
+  from urllib.request import urlopen as uopen
+  import urllib.request
+except:
+  from urllib import urlopen as uopen
+
+import string
+
+try:
+    import json
+except ImportError:
+    import simplejson as json
+
 import os
 
 XKCD_IP='72.26.203.99'
