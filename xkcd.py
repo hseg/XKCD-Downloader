@@ -113,9 +113,9 @@ def download(num):
 
     image = uopen(data['img'])
     try:
-        img = open('{0}.png'.format(num), 'bw')
+        img = open('{0}.png'.format(num), 'wb')
     except AttributeError:
-        img = open('%d.png' % num, 'bw')
+        img = open('%d.png' % num, 'wb')
     img.write(image.read())
 
 import os.path
