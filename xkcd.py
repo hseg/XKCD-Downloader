@@ -76,7 +76,7 @@ def update_meta(meta):
     except AttributeError:
         meta['date'] = '{%s}/{%s}/{%s}' % (meta['day'],
             meta['month'], meta['year'])
-    meta['url'] = url.rsplit('/', 1)[0] + '/'
+    meta['url'] = meta['img'].rsplit('/', 1)[0] + '/'
 
 
 def download(num):
