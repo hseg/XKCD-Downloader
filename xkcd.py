@@ -98,17 +98,18 @@ def download(num):
     # Write HTML and image to file
     if sys.version_info[0] >= 3:
         file = open('{0}.html'.format(num), 'w', encoding='utf-8')
-        file.write(head.substitute(data))
+        file.write(TEMPLATES['head'].substitute(data))
         for i in filter((lambda i: i or False), meta_labels.keys()):
-            file.write(entry.substitute({'label': meta_labels[i], 'value': data[i]}))
-        file.write(tail.substitute(data))
+            file.write(TEMPLATES['entry'].substitute({'label': meta_labels[i], 'value': data[i]}))
+        file.write(TEMPLATES['tail'].substitute(data))
         file.close()
     else:
         file = open('%d.html' % num, 'w')
-        file.write(head.substitute(data.encode('utf-8')))
+        file.write((TEMPLATES['head'].substitute(data)).encode('utf-8'))
         for i in filter((lambda i: i or False), meta_labels.keys()):
-            file.write(entry.substitute({'label': meta_labels[i], 'value': data[i]}).encode('utf-8'))
-        file.write(tail.substitute(data).encode('utf-8'))
+            file.write((TEMPLATES['entry'].substitute({'label': meta_labels[i],
+                'value': data[i]})).encode('utf-8'))
+        file.write((TEMPLATES['tail'].substitute(data)).encode('utf-8'))
         file.close()
 
     image = uopen(data['img'])
