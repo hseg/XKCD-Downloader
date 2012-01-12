@@ -34,7 +34,7 @@ def gen_templates():
 <body>
 <h1><a href="${url}">${safe_title}</a></h1>
 <table>''')
-    TEMPLATES['entry'] =
+    TEMPLATES['entry'] = \
        string.Template('<tr><td><b>${label}</b></td><td>${value}</td></tr>')
     TEMPLATES['tail'] = string.Template('''
 </table>
@@ -68,10 +68,10 @@ def get_json(num):
 def update_meta(meta):
     meta['date'] = '{0}/{1}/{2}'.format(meta['day'], meta['month'], meta['year'])
     meta['url'] = url.rsplit('/', 1)[0] + '/'
-                'link': 'Link:'}
+
 
 def download(num):
-    data = get_json(num):
+    data = get_json(num)
 
     # Save JSON
     json_file = open('{0}.json'.format(num), 'w', encoding='utf-8')
