@@ -19,6 +19,7 @@ except ImportError:
     import simplejson as json
 
 import os
+import cgi
 
 XKCD_IP='72.26.203.99'
 TEMPLATES={}
@@ -100,7 +101,7 @@ def download(num):
         file = open('{0}.html'.format(num), 'w', encoding='utf-8')
         file.write(TEMPLATES['head'].substitute(data))
         for i in filter((lambda i: i or False), meta_labels.keys()):
-            file.write(TEMPLATES['entry'].substitute({'label': meta_labels[i], 'value': data[i]}))
+            file.write(TEMPLATES['entry'].substitute({'label': meta_labels[i], 'value': cgi.escape(str(data[i]).replace('"', '\"'))}))
         file.write(TEMPLATES['tail'].substitute(data))
         file.close()
     else:
@@ -108,7 +109,7 @@ def download(num):
         file.write((TEMPLATES['head'].substitute(data)).encode('utf-8'))
         for i in filter((lambda i: i or False), meta_labels.keys()):
             file.write((TEMPLATES['entry'].substitute({'label': meta_labels[i],
-                'value': data[i]})).encode('utf-8'))
+                'value': cgi.escape(str(data[i]).replace('"', '\"'))})).encode('utf-8'))
         file.write((TEMPLATES['tail'].substitute(data)).encode('utf-8'))
         file.close()
 
