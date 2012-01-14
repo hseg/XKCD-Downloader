@@ -119,20 +119,63 @@ def download(num):
 
 import os.path
 
-if __name__ == "__main__":
-    # Get latest comic number
-    num = get_json(0)['num']
+def prerequisites():
+  # Make sure the target directory exists or create it
+  os.chdir(os.path.dirname(__file__))
+  path = os.path.join('..', 'xkcd')
+  if not os.path.exists(path) or (os.path.exists(path) and not os.path.isdir(path)):
+    try:
+      os.makedirs(path)
+    except os.error:
+      print ("The directory to save xkcd to doesn't exist and I couldn't create it, %s" % path)
+      exit()
+  os.chdir(path)
+  # Get latest comic number
+  return get_json(0)['num']
 
-    path = os.path.join('..', 'xkcd')
 
-    if not os.path.exists(path) or (os.path.exists(path) and not os.path.isdir(path)):
+def download_current():
+  download(prerequisites())
+
+
+def download_archive():
+  num = prerequisites()
+  for i in range(1, num+1):
+    if i != 404:
+      print("Downloading comic #%d" % i)
+      download(i)
+
+
+def download_number(index):
+  if index == 404 or index < 0 or index > prerequisites():
+    print("Comic with this ID doesn't exist")
+  else:
+    download(index)
+
+
+def show_help():
+  print("""Usage:
+./xkcd.py all         // Download the WHOLE XKCD webcomic archive
+./xkcd.py current     // Download the current comic (put this in your crontab!)
+./xkcd.py [index]     // Download the specified comic number.
+./xkcd.py help        // Show this message""")
+
+
+def main():
+  if len(argv) > 1:
+    if argv[1] == "current":
+      download_current()
+    elif argv[1] == "all":
+      download_archive()
+    else:
       try:
-        os.makedirs(path)
-      except os.error:
-        print ("The directory to save xkcd to doesn't exist and I couldn't create it, %s" % path)
-        exit()
-    os.chdir(path)
-    for i in range(1, num+1):
-        if i != 404:
-            print(i)
-            download(i)
+        index = int(argv[1])
+        download_number(index)
+      except:
+        show_help()
+  else:
+    show_help()
+
+
+if __name__ == "__main__":
+    main()
