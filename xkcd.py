@@ -24,15 +24,6 @@ import cgi
 XKCD_IP='72.26.203.99'
 TEMPLATES={}
 
-def write(file, str):
-""" A wrapper around file.write which writes the string
-    in utf-8, abstracting away the version differences
-"""
-    if sys.version_info[0] >= 3:
-        file.write(str)
-    else:
-        file.write(str.encode('utf-8')
-
 def gen_templates():
     TEMPLATES['head'] = string.Template('''
 <!DOCTYPE html>
@@ -91,9 +82,12 @@ def download(num):
     data = get_json(num)
 
     # Save JSON
-    json_file = open(str(num) + '.json', 'w', encoding='utf-8')
-
-    write(json_file,str(data))
+    if sys.version_info[0] >= 3:
+        json_file = open('{0}.json'.format(num), 'w', encoding='utf-8')
+        json_file.write(str(data))
+    else:
+        json_file = open('%d.json' % num, 'w')
+        json_file.write(str(data).encode('utf-8'))
 
     # Create HTML from template
     update_meta(data)
@@ -101,14 +95,21 @@ def download(num):
                 'link': 'Link:'}
 
     # Write HTML and image to file
-    file = open(str(num) + '.html', 'w', encoding='utf-8')
-
-    write(file, TEMPLATES['head'].substitute(data))
-    for i in filter((lambda i: i or False), meta_labels.keys()):
-        write(file, TEMPLATES['entry'].substitute({'label': meta_labels[i],
-            'value': cgi.escape(str(data[i], quote=True))}))
-    write(file, TEMPLATES['tail'].substitute(data))
-    file.close()
+    if sys.version_info[0] >= 3:
+        file = open('{0}.html'.format(num), 'w', encoding='utf-8')
+        file.write(TEMPLATES['head'].substitute(data))
+        for i in filter((lambda i: i or False), meta_labels.keys()):
+            file.write(TEMPLATES['entry'].substitute({'label': meta_labels[i], 'value': cgi.escape(str(data[i]).replace('"', '\"'))}))
+        file.write(TEMPLATES['tail'].substitute(data))
+        file.close()
+    else:
+        file = open('%d.html' % num, 'w')
+        file.write((TEMPLATES['head'].substitute(data)).encode('utf-8'))
+        for i in filter((lambda i: i or False), meta_labels.keys()):
+            file.write((TEMPLATES['entry'].substitute({'label': meta_labels[i],
+                'value': cgi.escape(str(data[i]).replace('"', '\"'))})).encode('utf-8'))
+        file.write((TEMPLATES['tail'].substitute(data)).encode('utf-8'))
+        file.close()
 
     image = uopen(data['img'])
     try:
