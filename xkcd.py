@@ -22,28 +22,23 @@ import os
 import cgi
 
 XKCD_IP='72.26.203.99'
-TEMPLATES={}
-
-def gen_templates():
-    TEMPLATES['head'] = string.Template('''
-<!DOCTYPE html>
+TEMPLATES={ 'head': string.Template('''<!DOCTYPE html>
 <html>
 <head>
 <title>XKCD: ${safe_title}</title>
 </head>
 <body>
 <h1><a href="${url}">${safe_title}</a></h1>
-<table>''')
-    TEMPLATES['entry'] = \
-       string.Template('<tr><td><b>${label}</b></td><td>${value}</td></tr>')
-    TEMPLATES['tail'] = string.Template('''
-</table>
+<table>'''),
+  'entry': string.Template('<tr><td><b>${label}</b></td><td>${value}</td></tr>'),
+  'tail': string.Template('''</table>
 <a href="${img}"><img src="${num}.png" title="${alt}" /></a>
 <p>${alt}</p>
 <br/><br/>
 <p>${transcript}
 </body>
-</html>''')
+</html>''')}
+
 
 def get_url(num):
     if(num >= 1):
@@ -121,7 +116,6 @@ def download(num):
 import os.path
 
 if __name__ == "__main__":
-    gen_templates()
     # Get latest comic number
     num = get_json(0)['num']
 
