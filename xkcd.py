@@ -102,7 +102,7 @@ def download(num):
         file.write(TEMPLATES['head'].substitute(data))
         for i in filter((lambda i: i or False), meta_labels.keys()):
             file.write(TEMPLATES['entry'].substitute({'label': meta_labels[i],
-              'value': cgi.escape(str(data[i]).replace('"', '\"'))}))
+              'value': cgi.escape(str(data[i], quote=True))}))
         file.write(TEMPLATES['tail'].substitute(data))
         file.close()
     else:
@@ -110,7 +110,7 @@ def download(num):
         file.write((TEMPLATES['head'].substitute(data)).encode('utf-8'))
         for i in filter((lambda i: i or False), meta_labels.keys()):
             file.write((TEMPLATES['entry'].substitute({'label': meta_labels[i],
-              'value': cgi.escape(str(data[i]).replace('"', '\"'))})).encode('utf-8'))
+              'value': cgi.escape(str(data[i], quote=True))})).encode('utf-8'))
         file.write((TEMPLATES['tail'].substitute(data)).encode('utf-8'))
         file.close()
 
