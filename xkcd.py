@@ -7,10 +7,10 @@ import sys
 from sys import argv
 
 try:
-  from urllib.request import urlopen as uopen
-  import urllib.request
+    from urllib.request import urlopen as uopen
+    import urllib.request
 except:
-  from urllib import urlopen as uopen
+    from urllib import urlopen as uopen
 
 import string
 
@@ -31,8 +31,8 @@ TEMPLATES={ 'head': string.Template('''<!DOCTYPE html>
 <body>
 <h1><a href="${url}">${safe_title}</a></h1>
 <table>'''),
-  'entry': string.Template('<tr><td><b>${label}</b></td><td>${value}</td></tr>'),
-  'tail': string.Template('''</table>
+    'entry': string.Template('<tr><td><b>${label}</b></td><td>${value}</td></tr>'),
+    'tail': string.Template('''</table>
 <a href="${img}"><img src="${num}.png" title="${alt}" /></a>
 <p>${alt}</p>
 <br/><br/>
@@ -64,7 +64,7 @@ def get_json(num):
 
     # A crutch for a comic json with apparently an error in it
     if num == 971:
-      comic = comic.replace("\u00e2\u0080\u0099", "'")    
+        comic = comic.replace("\u00e2\u0080\u0099", "'")
 
     # Open JSON file
     return json.loads(comic)
@@ -102,7 +102,7 @@ def download(num):
         file.write(TEMPLATES['head'].substitute(data))
         for i in filter((lambda i: i or False), meta_labels.keys()):
             file.write(TEMPLATES['entry'].substitute({'label': meta_labels[i],
-              'value': cgi.escape(str(data[i], quote=True))}))
+                'value': cgi.escape(str(data[i], quote=True))}))
         file.write(TEMPLATES['tail'].substitute(data))
         file.close()
     else:
@@ -123,62 +123,70 @@ def download(num):
 
 import os.path
 
-def prerequisites():
-  # Make sure the target directory exists or create it
-  os.chdir(os.path.dirname(__file__))
-  path = os.path.join('..', 'xkcd')
-  if not os.path.exists(path) or (os.path.exists(path) and not os.path.isdir(path)):
+def prerequisites(path = None):
+    # Make sure the target directory exists or create it
+    os.chdir(os.path.dirname(__file__))
+    if not out_dir:
+        path = os.path.join('..', 'xkcd')
+    if not os.path.exists(path) or (os.path.exists(path) and not os.path.isdir(path)):
     try:
-      os.makedirs(path)
+        os.makedirs(path)
     except os.error:
-      print ("The directory to save xkcd to doesn't exist and I couldn't create it, %s" % path)
-      exit()
-  os.chdir(path)
-  # Get latest comic number
-  return get_json(0)['num']
+        print ("The directory to save xkcd to doesn't exist and I couldn't create it, %s" % path)
+        exit()
+    os.chdir(path)
+    # Get latest comic number
+    return get_json(0)['num']
 
 
-def download_current():
-  download(prerequisites())
+def download_current(out_dir):
+    download(prerequisites(out_dir))
 
 
-def download_archive():
-  num = prerequisites()
-  for i in range(1, num+1):
-    if i != 404:
-      print("Downloading comic #%d" % i)
-      download(i)
+def download_archive(out_dir):
+    num = prerequisites(out_dir)
+    for i in range(1, num+1):
+        if i != 404:
+        print("Downloading comic #%d" % i)
+        download(i, out_dir)
 
 
-def download_number(index):
-  if index == 404 or index < 0 or index > prerequisites():
-    print("Comic with this ID doesn't exist")
-  else:
-    download(index)
+def download_number(index, out_dir):
+    if index == 404 or index < 0 or index > prerequisites(out_dir):
+        print("Comic with this ID doesn't exist")
+    else:
+        download(index)
 
 
 def show_help():
-  print("""Usage:
-./xkcd.py all         // Download the WHOLE XKCD webcomic archive
-./xkcd.py current     // Download the current comic (put this in your crontab!)
-./xkcd.py [index]     // Download the specified comic number.
-./xkcd.py help        // Show this message""")
+    print("""Usage: ./xkcd.py <command> [options]
+        Options:
+            -o <dir>    // Output to directory dir, create it if it doesn't exist
+
+        Commands:
+            all         // Download the WHOLE XKCD webcomic archive
+            current     // Download the current comic (put this in your crontab!)
+            [index]     // Download the specified comic number.
+            help        // Show this message""")
 
 
 def main():
-  if len(argv) > 1:
+    if len(argv) > 1:
+        if len(argv) > 3 and argv[2] == "-o":
+            out_dir = argv[3]
+
     if argv[1] == "current":
-      download_current()
+        download_current(out_dir)
     elif argv[1] == "all":
-      download_archive()
+        download_archive(out_dir)
     else:
-      try:
-        index = int(argv[1])
-        download_number(index)
-      except:
+        try:
+            index = int(argv[1])
+            download_number(index, out_dir)
+        except:
+            show_help()
+    else:
         show_help()
-  else:
-    show_help()
 
 
 if __name__ == "__main__":
