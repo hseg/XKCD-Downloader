@@ -62,6 +62,10 @@ def get_json(num):
         except:
             raise
 
+    # A crutch for a comic json with apparently an error in it
+    if num == 971:
+      comic = comic.replace("\u00e2\u0080\u0099", "'")    
+
     # Open JSON file
     return json.loads(comic)
 
