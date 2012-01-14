@@ -4,6 +4,7 @@
 # Downloads an XKCD comic given the comic number.
 # Filters the data and reformats it.
 import sys
+from sys import argv
 
 try:
   from urllib.request import urlopen as uopen
@@ -49,10 +50,11 @@ def get_url(num):
     else:
         return 'http://' + XKCD_IP + '/info.0.json'
 
+
 def get_json(num):
     url = get_url(num)
 
-# Download JSON
+    # Download JSON, retrying in case of an error
     while True:
         try:
             comic = uopen(url).read().decode()
@@ -62,6 +64,7 @@ def get_json(num):
 
     # Open JSON file
     return json.loads(comic)
+
 
 def update_meta(meta):
     try:
@@ -94,7 +97,8 @@ def download(num):
         file = open('{0}.html'.format(num), 'w', encoding='utf-8')
         file.write(TEMPLATES['head'].substitute(data))
         for i in filter((lambda i: i or False), meta_labels.keys()):
-            file.write(TEMPLATES['entry'].substitute({'label': meta_labels[i], 'value': cgi.escape(str(data[i]).replace('"', '\"'))}))
+            file.write(TEMPLATES['entry'].substitute({'label': meta_labels[i],
+              'value': cgi.escape(str(data[i]).replace('"', '\"'))}))
         file.write(TEMPLATES['tail'].substitute(data))
         file.close()
     else:
@@ -102,7 +106,7 @@ def download(num):
         file.write((TEMPLATES['head'].substitute(data)).encode('utf-8'))
         for i in filter((lambda i: i or False), meta_labels.keys()):
             file.write((TEMPLATES['entry'].substitute({'label': meta_labels[i],
-                'value': cgi.escape(str(data[i]).replace('"', '\"'))})).encode('utf-8'))
+              'value': cgi.escape(str(data[i]).replace('"', '\"'))})).encode('utf-8'))
         file.write((TEMPLATES['tail'].substitute(data)).encode('utf-8'))
         file.close()
 
