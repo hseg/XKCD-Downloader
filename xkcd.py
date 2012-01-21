@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# XKCD Downloader
-# Downloads an XKCD comic given the comic number.
-# Filters the data and reformats it.
+# xkcd Downloader
 import sys
 from sys import argv
 
@@ -21,6 +19,7 @@ except ImportError:
 
 import os
 import cgi
+import argparse
 
 XKCD_IP='72.26.203.99'
 TEMPLATES={ 'head': string.Template('''<!DOCTYPE html>
@@ -139,55 +138,48 @@ def prerequisites(path = None):
     return get_json(0)['num']
 
 
-def download_current(out_dir):
-    download(prerequisites(out_dir))
+def download_current(args):
+    download(prerequisites(args.out_dir))
 
 
-def download_archive(out_dir):
-    num = prerequisites(out_dir)
+def download_archive(args):
+    num = prerequisites(args.out_dir)
     for i in range(1, num+1):
         if i != 404:
         print("Downloading comic #%d" % i)
-        download(i, out_dir)
+        download(i, args.out_dir)
 
 
-def download_number(index, out_dir):
-    if index == 404 or index < 0 or index > prerequisites(out_dir):
+def download_number(args):
+    if args.index == 404 or args.index < 0 or
+            args.index > prerequisites(args.out_dir):
         print("Comic with this ID doesn't exist")
     else:
-        download(index)
+        download(args.index)
 
 
-def show_help():
-    print("""Usage: ./xkcd.py <command> [options]
-        Options:
-            -o <dir>    // Output to directory dir, create it if it doesn't exist
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Downloads xkcd comics, filtering and reformatting them.')
+    parser.add_argument('-o', help="Output to the specified directory,
+        creating it if it doesn't exist", dest=out_dir)
 
-        Commands:
-            all         // Download the WHOLE XKCD webcomic archive
-            current     // Download the current comic (put this in your crontab!)
-            [index]     // Download the specified comic number.
-            help        // Show this message""")
+    comm_parser = parser.add_subparsers(title='command',
+        description = 'the selection method')
+    all_parser = comm_parser.add_parser('all', help = 'Download entire archive')
+    all_parser.set_defaults(func=download_archive)
+    current_parser = comm_parser.add_parser('current',
+        help = 'Download the current comic (put this in your crontab!)')
+    current_parser.set_defaults(func=download_current)
+    comic_parser = comic_parser.add_parser('comic',
+        help = 'Download the specified comic number.')
+    comic_parser.set_defaults(func=download_number)
 
+    args = parser.parse_args()
+    args.func(args)
 
 def main():
-    if len(argv) > 1:
-        if len(argv) > 3 and argv[2] == "-o":
-            out_dir = argv[3]
-
-    if argv[1] == "current":
-        download_current(out_dir)
-    elif argv[1] == "all":
-        download_archive(out_dir)
-    else:
-        try:
-            index = int(argv[1])
-            download_number(index, out_dir)
-        except:
-            show_help()
-    else:
-        show_help()
-
+    parse_args()
 
 if __name__ == "__main__":
     main()
