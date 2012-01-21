@@ -30,15 +30,14 @@ TEMPLATES={ 'head': string.Template('''<!DOCTYPE html>
 <body>
 <h1><a href="${url}">${safe_title}</a></h1>
 <table>'''),
-    'entry': string.Template('<tr><td><b>${label}</b></td><td>${value}</td></tr>'),
-    'tail': string.Template('''</table>
+'entry': string.Template('<tr><td><b>${label}</b></td><td>${value}</td></tr>'),
+'tail': string.Template('''</table>
 <a href="${img}"><img src="${num}.png" title="${alt}" /></a>
 <p>${alt}</p>
 <br/><br/>
 <p>${transcript}
 </body>
 </html>''')}
-
 
 def get_url(num):
     if(num >= 1):
@@ -109,7 +108,7 @@ def download(num):
         file.write((TEMPLATES['head'].substitute(data)).encode('utf-8'))
         for i in filter((lambda i: i or False), meta_labels.keys()):
             file.write((TEMPLATES['entry'].substitute({'label': meta_labels[i],
-              'value': cgi.escape(str(data[i], quote=True))})).encode('utf-8'))
+                'value': cgi.escape(str(data[i], quote=True))})).encode('utf-8'))
         file.write((TEMPLATES['tail'].substitute(data)).encode('utf-8'))
         file.close()
 
@@ -127,11 +126,13 @@ def prerequisites(path = None):
     os.chdir(os.path.dirname(__file__))
     if not out_dir:
         path = os.path.join('..', 'xkcd')
-    if not os.path.exists(path) or (os.path.exists(path) and not os.path.isdir(path)):
+    if not os.path.exists(path) or (os.path.exists(path)
+        and not os.path.isdir(path)):
     try:
         os.makedirs(path)
     except os.error:
-        print ("The directory to save xkcd to doesn't exist and I couldn't create it, %s" % path)
+        print ("The directory to save xkcd to doesn't exist
+            and couldn't be created, %s" % path)
         exit()
     os.chdir(path)
     # Get latest comic number
