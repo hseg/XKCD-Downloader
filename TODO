@@ -1,9 +1,0 @@
-TODO: Update archive option
-TODO: Use more robust command-line parsing than doing it manually
-      (optparse and argparse)
-      - Problem: Clutters code
-      - Suggested solution: have some kind of class or several global functions
-                            to wrap the version-dependent code
-        - Problem: Makes code a little less readable.
-TODO: Allow for PDF output (unsure of how to do this yet)
-TODO: Custom HTML templates
