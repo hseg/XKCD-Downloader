@@ -128,16 +128,15 @@ def prerequisites(path = None):
         path = os.path.join('..', 'xkcd')
     if not os.path.exists(path) or (os.path.exists(path)
         and not os.path.isdir(path)):
-    try:
-        os.makedirs(path)
-    except os.error:
-        print ("The directory to save xkcd to doesn't exist
-            and couldn't be created, %s" % path)
-        exit()
+        try:
+            os.makedirs(path)
+        except os.error:
+            print ("The directory to save xkcd to doesn't exist\
+                and couldn't be created, %s" % path)
+            exit()
     os.chdir(path)
     # Get latest comic number
     return get_json(0)['num']
-
 
 def download_current(args):
     download(prerequisites(args.out_dir))
