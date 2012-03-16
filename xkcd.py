@@ -119,6 +119,9 @@ def download(num):
         img = open('%d.png' % num, 'wb')
     img.write(image.read())
 
+def valid_idlist(max):
+    return [i for i in range(1,max+1) if not (i == 404)]
+
 import os.path
 
 def prerequisites(path = None):
@@ -142,25 +145,28 @@ def download_current(args):
     download(prerequisites(args.out_dir))
 
 def download_archive(args):
-    num = prerequisites(args.out_dir)
-    for i in range(1, num+1):
-        if i != 404:
+    for i in valid_idlist(prerequisites(args.out_dir)):
         print("Downloading comic #%d" % i)
         download(i)
 
 def download_number(args):
-    if args.index == 404 or args.index < 0 or
-            args.index > prerequisites(args.out_dir):
+    if (args.index in valid_idlist(prerequisites(args.out_dir))):
         print("Comic with this ID doesn't exist")
     else:
         download(args.index)
 
+def download_update(args):
+    to_download = set(x for x in valid_idlist(prerequisites(args.out_dir))
+        if not(os.path.exists("%s.html" % x) or os.path.exists("%s.htm" % x)))
+    for i in to_download:
+        print("Downloading comic #%d" % i)
+        download(i)
 
 def parse_args():
     parser = argparse.ArgumentParser(
         description='Downloads xkcd comics, filtering and reformatting them.')
-    parser.add_argument('-o', help="Output to the specified directory,
-        creating it if it doesn't exist", dest=out_dir)
+    parser.add_argument('-o', '--out_dir',
+      help="Output to the specified directory, (default: .\\xkcd)")
 
     comm_parser = parser.add_subparsers(title='command',
         description = 'the selection method')
@@ -169,12 +175,16 @@ def parse_args():
     all_parser.set_defaults(func=download_archive)
 
     current_parser = comm_parser.add_parser('current',
-        help = 'Download the current comic (put this in your crontab!)')
+        help = 'Download the current comic')
     current_parser.set_defaults(func=download_current)
 
     comic_parser = comm_parser.add_parser('comic',
         help = 'Download the specified comic number.')
     comic_parser.set_defaults(func=download_number)
+
+    update_parser = comm_parser.add_parser('update', help='Update the archive '
+                                + '- put this in your crontab')
+    update_parser.set_defaults(func=download_update)
 
     args = parser.parse_args()
     args.func(args)
