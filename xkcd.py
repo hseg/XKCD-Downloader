@@ -98,17 +98,17 @@ def download(num):
     if sys.version_info[0] >= 3:
         file = open('{0}.html'.format(num), 'w', encoding='utf-8')
         file.write(TEMPLATES['head'].substitute(data))
-        for i in filter((lambda i: i or False), meta_labels.keys()):
+        for i in filter((lambda i: data[i] or False), meta_labels.keys()):
             file.write(TEMPLATES['entry'].substitute({'label': meta_labels[i],
-                'value': cgi.escape(str(data[i], quote=True))}))
+                'value': cgi.escape(str(data[i]), quote=True)}))
         file.write(TEMPLATES['tail'].substitute(data))
         file.close()
     else:
         file = open('%d.html' % num, 'w')
         file.write((TEMPLATES['head'].substitute(data)).encode('utf-8'))
-        for i in filter((lambda i: i or False), meta_labels.keys()):
+        for i in filter((lambda i: data[i] or False), meta_labels.keys()):
             file.write((TEMPLATES['entry'].substitute({'label': meta_labels[i],
-                'value': cgi.escape(str(data[i], quote=True))})).encode('utf-8'))
+                'value': cgi.escape(str(data[i]), quote=True)})).encode('utf-8'))
         file.write((TEMPLATES['tail'].substitute(data)).encode('utf-8'))
         file.close()
 
@@ -124,7 +124,7 @@ import os.path
 def prerequisites(path = None):
     # Make sure the target directory exists or create it
     os.chdir(os.path.dirname(__file__))
-    if not out_dir:
+    if not path:
         path = os.path.join('..', 'xkcd')
     if not os.path.exists(path) or (os.path.exists(path)
         and not os.path.isdir(path)):
@@ -141,14 +141,12 @@ def prerequisites(path = None):
 def download_current(args):
     download(prerequisites(args.out_dir))
 
-
 def download_archive(args):
     num = prerequisites(args.out_dir)
     for i in range(1, num+1):
         if i != 404:
         print("Downloading comic #%d" % i)
-        download(i, args.out_dir)
-
+        download(i)
 
 def download_number(args):
     if args.index == 404 or args.index < 0 or
@@ -166,12 +164,15 @@ def parse_args():
 
     comm_parser = parser.add_subparsers(title='command',
         description = 'the selection method')
+
     all_parser = comm_parser.add_parser('all', help = 'Download entire archive')
     all_parser.set_defaults(func=download_archive)
+
     current_parser = comm_parser.add_parser('current',
         help = 'Download the current comic (put this in your crontab!)')
     current_parser.set_defaults(func=download_current)
-    comic_parser = comic_parser.add_parser('comic',
+
+    comic_parser = comm_parser.add_parser('comic',
         help = 'Download the specified comic number.')
     comic_parser.set_defaults(func=download_number)
 
