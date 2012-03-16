@@ -21,7 +21,6 @@ import os
 import cgi
 import argparse
 
-XKCD_IP='72.26.203.99'
 TEMPLATES={ 'head': string.Template('''<!DOCTYPE html>
 <html>
 <head>
@@ -42,11 +41,11 @@ TEMPLATES={ 'head': string.Template('''<!DOCTYPE html>
 def get_url(num):
     if(num >= 1):
         try:
-            return 'http://' + XKCD_IP + '/{0}/info.0.json'.format(num)
+            return 'http://www.xkcd.com/{0}/info.0.json'.format(num)
         except AttributeError:
-            return 'http://' + XKCD_IP + '/%d/info.0.json' % num
+            return 'http://www.xkcd.com/%d/info.0.json' % num
     else:
-        return 'http://' + XKCD_IP + '/info.0.json'
+        return 'http://www.xkcd.com/info.0.json'
 
 
 def get_json(num):
