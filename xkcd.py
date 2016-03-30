@@ -125,7 +125,7 @@ import os.path
 
 def prerequisites(path = None):
     # Make sure the target directory exists or create it
-    os.chdir(os.path.dirname(__file__))
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
     if not path:
         path = os.path.join('..', 'xkcd')
     if not os.path.exists(path) or (os.path.exists(path)
