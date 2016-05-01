@@ -1,3 +1,8 @@
+NOTE: This project has been abandoned, due to lack of interest and the
+realization that http://www.explainxkcd.com already provides a transcription of
+the comics. In order to maintain a local copy of their wiki, I suggest using
+https://github.com/moy/Git-Mediawiki
+
 Downloads XKCD comics and saves them with their metadata.
 
 The tool downloads the JSON for the specified comic and parses it.
